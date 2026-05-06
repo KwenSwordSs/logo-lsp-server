@@ -1,16 +1,23 @@
 package logo.lsp.server;
 
-public class LogoWorkspaceService {
+import org.eclipse.lsp4j.DidChangeConfigurationParams;
+import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
+import org.eclipse.lsp4j.services.WorkspaceService;
 
-//LogoWorkspaceService neden yok/olmamalı?
-//Aslında LSP4J’de LanguageServer interface’i senden iki servis ister:
-//getTextDocumentService()
-//getWorkspaceService()
-//Yani teknik olarak LogoWorkspaceService lazım.
-//Ama bizim proje workspace feature kullanmayacak. O yüzden bu class çok minimal olacak.
-//server/
-//├── LogoLanguageServer.java
-//├── LogoTextDocumentService.java
-//└── LogoWorkspaceService.java
-//LogoWorkspaceService şimdilik sadece interface’i satisfy etmek için var.
+
+/**
+ * Minimal workspace service implementation.
+ */
+public class LogoWorkspaceService implements WorkspaceService {
+
+    @Override
+    public void didChangeConfiguration(DidChangeConfigurationParams params) {
+        // No workspace configuration is required for this minimal server.
+    }
+
+    @Override
+    public void didChangeWatchedFiles(DidChangeWatchedFilesParams params) {
+        // File watching is not required for this minimal server.
+    }
+
 }

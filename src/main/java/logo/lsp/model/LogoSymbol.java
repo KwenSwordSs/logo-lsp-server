@@ -1,23 +1,18 @@
 package logo.lsp.model;
 
-public class LogoSymbol {
+/**
+ * Represents a declaration discovered in a LOGO document.
+ *
+ * @param name the symbol name without prefixes such as ':'
+ * @param type the symbol type
+ * @param line zero-based declaration line
+ * @param startColumn zero-based start column
+ * @param endColumn zero-based exclusive end column
+ */
+public record LogoSymbol(String name,
+                         LogoSymbolType type,
+                         int line,
+                         int startColumn,
+                         int endColumn) {
 
-//Bu layer ortak data classlarını tutar.
-//model/
-//├── LogoSymbol.java
-//├── LogoSymbolType.java
-//└── LogoPosition.java   optional
-
-    //LogoSymbol
-    //Bir declaration’ı temsil eder.
-    //Örnek:
-    //name = square
-    //type = PROCEDURE
-    //line = 0
-    //column = 3
-    //veya:
-    //name = size
-    //type = VARIABLE
-    //line = 0
-    //column = 10
 }

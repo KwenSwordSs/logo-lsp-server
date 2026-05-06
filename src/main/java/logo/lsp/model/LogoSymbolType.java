@@ -1,8 +1,9 @@
 package logo.lsp.model;
 
-public class LogoSymbolType {
-
-//LogoSymbolType
-//PROCEDURE
-//VARIABLE
+/**
+ * Represents the type of LOGO symbol.
+ */
+public enum LogoSymbolType {
+    PROCEDURE,
+    VARIABLE
 }

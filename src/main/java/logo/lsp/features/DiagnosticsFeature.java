@@ -1,20 +1,20 @@
 package logo.lsp.features;
 
-public class DiagnosticsFeature {
+import java.util.List;
 
-//Hata/uyarı üretir.
+import logo.lsp.analysis.LogoAnalysisResult;
+import logo.lsp.analysis.LogoAnalyzer;
+import org.eclipse.lsp4j.Diagnostic;
 
+/**
+ * Creates diagnostics for LOGO source documents.
+ */
+public final class DiagnosticsFeature {
 
-//Kullanacağı şey:
-//LogoAnalyzer
+    private final LogoAnalyzer analyzer = new LogoAnalyzer();
 
-
-//Akış:
-//text
-//↓
-//LogoAnalyzer.analyze(text)
-//↓
-//diagnostics list
-//↓
-//client.publishDiagnostics(...)
+    public List<Diagnostic> createDiagnostics(String text) {
+        LogoAnalysisResult result = analyzer.analyze(text);
+        return result.diagnostics();
+    }
 }
