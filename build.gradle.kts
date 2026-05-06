@@ -19,5 +19,5 @@ dependencies {
 }
 
 application {
-    mainClass.set("Main")
+    mainClass.set("logo.lsp.Main")
 }
