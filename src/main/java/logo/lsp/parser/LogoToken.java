@@ -18,7 +18,7 @@ public record LogoToken(LogoTokenType type,
     public boolean contains(int targetLine, int targetColumn) {
         return line == targetLine
             && targetColumn >= startColumn
-            && targetColumn <= endColumn;
+            && targetColumn < endColumn;
     }
 
 

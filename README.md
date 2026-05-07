@@ -145,7 +145,7 @@ The server reports a diagnostic such as:
 ```text
 Missing 'end' for procedure definition.
 ```
-### Build & Run
+## Build & Run
 To build the project, run:
 ```sh
 ./gradlew shadowJar
@@ -172,8 +172,32 @@ Alternatively, during development, the server can be started directly with Gradl
 
 The language server communicates via standard input and standard output, as expected by common LSP clients.
 
+## Testing
 
-### Connecting to a Client
+The project contains unit tests for the lexer, analyzer, diagnostics, semantic tokens, and go-to-declaration logic.
+
+To run the tests, use:
+
+```sh
+./gradlew test
+```
+
+The tests cover the following behavior:
+
+- token recognition for LOGO keywords, commands, variables, numbers, and comments
+- procedure declaration detection
+- variable declaration detection
+- go-to-declaration for procedure calls
+- go-to-declaration for variable references
+- diagnostics for unknown procedures
+- diagnostics for unknown variables
+- diagnostics for incomplete procedure definitions
+
+The language server can also be tested manually by connecting it to an LSP-compatible editor and opening a `.logo` file.
+
+
+
+## Connecting to a Client
 
 This project implements a language server only. It does not include a custom editor or IDE plugin.
 
@@ -208,7 +232,7 @@ After the client starts the server, opening a `.logo` file should enable the sup
 - go-to-declaration for variable references
 - diagnostics for simple syntax and reference errors
 
-### Architecture && Project Layout
+## Architecture & Project Layout
 The project is organized into small components with clear responsibilities.
 
 ```text

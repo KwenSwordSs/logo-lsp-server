@@ -32,7 +32,7 @@ public final class LogoAnalyzer {
         List<Diagnostic> diagnostics = new ArrayList<>();
 
         collectDeclarations(tokens, procedures, variables, diagnostics);
-        collectDiagnostics(tokens, procedures, diagnostics);
+        collectDiagnostics(tokens, procedures, variables , diagnostics);
 
         return new LogoAnalysisResult(tokens, procedures, variables, diagnostics);
     }
@@ -102,10 +102,7 @@ public final class LogoAnalyzer {
         if (insideProcedure && hasOpenProcedure) {
             LogoToken lastToken = tokens.isEmpty() ? null : tokens.get(tokens.size() - 1);
             if (lastToken != null) {
-                diagnostics.add(createDiagnostic(
-                    lastToken,
-                    "Missing 'end' for procedure declaration."
-                ));
+                diagnostics.add(createDiagnostic(lastToken, "Missing 'end' for procedure definition."));
             }
         }
     }
@@ -113,24 +110,34 @@ public final class LogoAnalyzer {
     private void collectDiagnostics(
         List<LogoToken> tokens,
         Map<String, LogoSymbol> procedures,
+        Map<String, LogoSymbol> variables,
         List<Diagnostic> diagnostics
     ) {
         for (int i = 0; i < tokens.size(); i++) {
             LogoToken token = tokens.get(i);
 
-            if (token.type() != LogoTokenType.IDENTIFIER) {
-                continue;
+            if (token.type() == LogoTokenType.IDENTIFIER) {
+                if (isProcedureDeclarationName(tokens, i)) {
+                    continue;
+                }
+
+                if (!procedures.containsKey(token.text())) {
+                    diagnostics.add(createDiagnostic(
+                        token,
+                        "Unknown procedure: " + token.text()
+                    ));
+                }
             }
 
-            if (isProcedureDeclarationName(tokens, i)) {
-                continue;
-            }
+            if (token.type() == LogoTokenType.VARIABLE) {
+                String variableName = normalizeVariableName(token.text());
 
-            if (!procedures.containsKey(token.text())) {
-                diagnostics.add(createDiagnostic(
-                    token,
-                    "Undefined procedure: " + token.text()
-                ));
+                if (!variables.containsKey(variableName)) {
+                    diagnostics.add(createDiagnostic(
+                        token,
+                        "Unknown variable: " + token.text()
+                    ));
+                }
             }
         }
     }
@@ -142,7 +149,7 @@ public final class LogoAnalyzer {
 
         LogoToken previous = tokens.get(index - 1);
         return previous.type() == LogoTokenType.KEYWORD
-            && TO_KEYWORD.equals(previous.text().toLowerCase())
+            && TO_KEYWORD.equalsIgnoreCase(previous.text())
             && previous.line() == tokens.get(index).line();
     }
 
