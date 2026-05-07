@@ -1,6 +1,6 @@
 # LOGO LSP Server
 
-A lightweight Language Server Protocol implementation for the LOGO programming language.
+A lightweight Language Server Protocol implementation for the LOGO.
 
 LOGO is a high-level educational programming language known for its simple syntax and turtle graphics. Since LOGO does not have one strictly defined semantics, this project follows a consistent interpretation of common LOGO constructs and documents the assumptions made during implementation.
 
@@ -8,7 +8,7 @@ LOGO is a high-level educational programming language known for its simple synta
 
 This language server supports:
 
-- Syntax highlighting for LOGO language elements
+- Syntax highlighting for LOGO elements
 - Go-to-declaration for procedure references
 - Go-to-declaration for variable references
 - Additional LSP feature: diagnostics for simple syntax and reference errors
@@ -58,7 +58,7 @@ When this file is opened in an LSP-compatible editor, the server provides the fo
 
 ### Syntax Highlighting
 
-The server recognizes and highlights LOGO language elements such as:
+The server recognizes and highlights LOGO elements such as:
 
 - `to` and `end` as procedure definition keywords
 - `repeat` as a control keyword
