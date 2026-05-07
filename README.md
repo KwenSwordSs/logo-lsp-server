@@ -8,6 +8,7 @@ LOGO is a high-level educational programming language known for its simple synta
 
 This language server supports:
 
+
 - Syntax highlighting for LOGO elements
 - Go-to-declaration for procedure references
 - Go-to-declaration for variable references
