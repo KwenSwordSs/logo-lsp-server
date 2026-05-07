@@ -23,8 +23,6 @@ public class Main {
 
         server.connect(launcher.getRemoteProxy());
 
-        do {
             launcher.startListening();
-        } while ();
     }
 }
