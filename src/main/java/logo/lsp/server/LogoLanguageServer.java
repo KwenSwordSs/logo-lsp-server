@@ -6,7 +6,6 @@ import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.TextDocumentSyncKind;
-import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageClientAware;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -61,9 +60,7 @@ public final class LogoLanguageServer implements LanguageServer, LanguageClientA
         exitCode = 0;
         return CompletableFuture.completedFuture(null);
     }
-
     @Override
-    @JsonNotification("exit")
     public void exit() {
         System.exit(exitCode);
     }
