@@ -147,32 +147,34 @@ The server reports a diagnostic such as:
 Missing 'end' for procedure definition.
 ```
 ## Build & Run
-To build the project, run:
-```sh
-./gradlew shadowJar
-``` 
-This creates an executable JAR file in:
 
-```text
-build/libs/
-```
-
-You can run the server with:
+To build the project and run the tests, use:
 
 ```sh
-java -jar build/libs/logo-lsp-server-all.jar
+./gradlew build
 ```
 
-Depending on the generated file name, the JAR name may be slightly different. In that case, use the actual file name from the `build/libs/` directory.
+To run the tests separately, use:
 
-Alternatively, during development, the server can be started directly with Gradle:
+```sh
+./gradlew test
+```
 
-```bash
+To start the language server during development, use:
+
+```sh
 ./gradlew run
 ```
 
 The language server communicates via standard input and standard output, as expected by common LSP clients.
 
+When started from the terminal, the server keeps running and waits for messages from an LSP client. This is normal behavior for an LSP server.
+
+To stop the server manually, press:
+
+```text
+Ctrl + C
+```
 ## Testing
 
 The project contains unit tests for the lexer, analyzer, diagnostics, semantic tokens, and go-to-declaration logic.
