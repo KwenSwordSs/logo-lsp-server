@@ -44,7 +44,7 @@ public final class LogoAnalyzer {
         List<Diagnostic> diagnostics
     ) {
         boolean insideProcedure = false;
-        boolean hasOpenProcedure = false;
+//        boolean hasOpenProcedure = false;
 
         for (int i = 0; i < tokens.size(); i++) {
             LogoToken token = tokens.get(i);
@@ -74,17 +74,20 @@ public final class LogoAnalyzer {
                 );
 
                 insideProcedure = true;
-                hasOpenProcedure = true;
+//                hasOpenProcedure = true;
 
                 int parameterIndex = i + 2;
                 while (parameterIndex < tokens.size()
                     && tokens.get(parameterIndex).line() == token.line()
                     && tokens.get(parameterIndex).type() == LogoTokenType.VARIABLE) {
                     LogoToken parameter = tokens.get(parameterIndex);
+                    String variableName = normalizeVariableName(parameter.text()).toLowerCase();
+                    String variableKey = createVariableKey(procedureKey, variableName);
+
                     variables.put(
-                        normalizeVariableName(parameter.text()),
+                        variableKey,
                         new LogoSymbol(
-                            normalizeVariableName(parameter.text()),
+                            variableName,
                             LogoSymbolType.VARIABLE,
                             parameter.line(),
                             parameter.startColumn(),
@@ -97,11 +100,11 @@ public final class LogoAnalyzer {
 
             if (token.type() == LogoTokenType.KEYWORD && END_KEYWORD.equals(text)) {
                 insideProcedure = false;
-                hasOpenProcedure = false;
+//                hasOpenProcedure = false;
             }
         }
 
-        if (insideProcedure && hasOpenProcedure) {
+        if (insideProcedure) {
             LogoToken lastToken = tokens.isEmpty() ? null : tokens.get(tokens.size() - 1);
             if (lastToken != null) {
                 diagnostics.add(createDiagnostic(lastToken, "Missing 'end' for procedure definition."));
@@ -115,8 +118,22 @@ public final class LogoAnalyzer {
         Map<String, LogoSymbol> variables,
         List<Diagnostic> diagnostics
     ) {
+        String currentProcedure = null;
+
         for (int i = 0; i < tokens.size(); i++) {
             LogoToken token = tokens.get(i);
+
+            if (token.type() == LogoTokenType.KEYWORD && TO_KEYWORD.equalsIgnoreCase(token.text())) {
+                if (i + 1 < tokens.size() && tokens.get(i + 1).type() == LogoTokenType.IDENTIFIER) {
+                    currentProcedure = tokens.get(i + 1).text().toLowerCase();
+                }
+                continue;
+            }
+
+            if (token.type() == LogoTokenType.KEYWORD && END_KEYWORD.equalsIgnoreCase(token.text())) {
+                currentProcedure = null;
+                continue;
+            }
 
             if (token.type() == LogoTokenType.IDENTIFIER) {
                 if (isProcedureDeclarationName(tokens, i)) {
@@ -132,9 +149,22 @@ public final class LogoAnalyzer {
             }
 
             if (token.type() == LogoTokenType.VARIABLE) {
-                String variableName = normalizeVariableName(token.text());
+                if (isProcedureParameterDeclaration(tokens, i)) {
+                    continue;
+                }
 
-                if (!variables.containsKey(variableName)) {
+                if (currentProcedure == null) {
+                    diagnostics.add(createDiagnostic(
+                        token,
+                        "Unknown variable: " + token.text()
+                    ));
+                    continue;
+                }
+
+                String variableName = normalizeVariableName(token.text()).toLowerCase();
+                String variableKey = createVariableKey(currentProcedure, variableName);
+
+                if (!variables.containsKey(variableKey)) {
                     diagnostics.add(createDiagnostic(
                         token,
                         "Unknown variable: " + token.text()
@@ -142,6 +172,24 @@ public final class LogoAnalyzer {
                 }
             }
         }
+    }
+
+    private boolean isProcedureParameterDeclaration(List<LogoToken> tokens, int index) {
+        LogoToken token = tokens.get(index);
+
+        for (int i = index - 1; i >= 0; i--) {
+            LogoToken previous = tokens.get(i);
+
+            if (previous.line() != token.line()) {
+                return false;
+            }
+
+            if (previous.type() == LogoTokenType.KEYWORD && TO_KEYWORD.equalsIgnoreCase(previous.text())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean isProcedureDeclarationName(List<LogoToken> tokens, int index) {
@@ -171,5 +219,9 @@ public final class LogoAnalyzer {
             return variable.substring(1);
         }
         return variable;
+    }
+
+    private String createVariableKey(String procedureName, String variableName) {
+        return procedureName.toLowerCase() + ":" + variableName.toLowerCase();
     }
 }

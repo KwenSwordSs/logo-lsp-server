@@ -83,6 +83,5 @@ class LogoAnalyzerTest {
         LogoAnalysisResult result = analyzer.analyze(text);
 
         assertTrue(result.procedures().containsKey("square"));
-        assertTrue(result.variables().containsKey("size"));
-    }
+        assertTrue(result.variables().containsKey("square:size"));    }
 }
