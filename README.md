@@ -179,7 +179,7 @@ To stop the server manually, press:
 Ctrl + C
 ```
 
-If the run task is stopped manually, Gradle or the IDE may show the task as cancelled. This is expected because the language server is a long-running process.
+If the run task is stopped manually, Gradle or the IDE may show the task as canceled. This is expected because the language server is a long-running process.
 
 ## Testing
 
