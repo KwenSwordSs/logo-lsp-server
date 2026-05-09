@@ -1,18 +1,17 @@
 # LOGO LSP Server
 
-A lightweight Language Server Protocol implementation for the LOGO.
+A lightweight Language Server Protocol implementation for the LOGO programming language.
 
 LOGO is a high-level educational programming language known for its simple syntax and turtle graphics. Since LOGO does not have one strictly defined semantics, this project follows a consistent interpretation of common LOGO constructs and documents the assumptions made during implementation.
 
 ## Features
 
-This language server supports:
+This language server provides editor support for a documented subset of common LOGO constructs:
 
-
-- Syntax highlighting for LOGO elements
+- Semantic-token based syntax highlighting for LOGO keywords, turtle commands, procedure names, variables, numbers, comments, operators, and brackets
 - Go-to-declaration for procedure references
-- Go-to-declaration for variable references
-- Additional LSP feature: diagnostics for simple syntax and reference errors
+- Go-to-declaration for variable references declared as procedure parameters
+- Diagnostics for simple syntax and reference errors, such as unknown procedures, unknown variables, invalid procedure declarations, and missing `end` statements
 
 ## Supported LOGO Constructs
 
@@ -25,6 +24,7 @@ The server recognizes common LOGO constructs such as:
 - comments
 - numeric literals
 - identifiers
+- brackets and simple operators
 
 Example:
 
@@ -55,6 +55,7 @@ end
 
 square 100
 ```
+
 When this file is opened in an LSP-compatible editor, the server provides the following behavior.
 
 ### 1. Syntax Highlighting
@@ -67,6 +68,7 @@ The server recognizes and highlights LOGO elements such as:
 - `square` as a procedure name
 - `:size` as a variable reference
 - `100` and `90` as numeric literals
+- `[` and `]` as brackets
 
 ### 2. Go-to-Declaration for Procedures
 
@@ -146,6 +148,7 @@ The server reports a diagnostic such as:
 ```text
 Missing 'end' for procedure definition.
 ```
+
 ## Build & Run
 
 To build the project and run the tests, use:
@@ -175,6 +178,9 @@ To stop the server manually, press:
 ```text
 Ctrl + C
 ```
+
+If the run task is stopped manually, Gradle or the IDE may show the task as cancelled. This is expected because the language server is a long-running process.
+
 ## Testing
 
 The project contains unit tests for the lexer, analyzer, diagnostics, semantic tokens, and go-to-declaration logic.
@@ -187,7 +193,7 @@ To run the tests, use:
 
 The tests cover the following behavior:
 
-- token recognition for LOGO keywords, commands, variables, numbers, and comments
+- token recognition for LOGO keywords, commands, variables, numbers, comments, brackets, and operators
 - procedure declaration detection
 - variable declaration detection
 - go-to-declaration for procedure calls
@@ -198,7 +204,31 @@ The tests cover the following behavior:
 
 The language server can also be tested manually by connecting it to an LSP-compatible editor and opening a `.logo` file.
 
+### LSP Smoke Test
 
+In addition to unit tests, the server can be tested through a small smoke test that starts the generated application script and sends real LSP JSON-RPC messages to it.
+
+First create the Gradle application distribution:
+
+```sh
+./gradlew installDist
+```
+
+Then run:
+
+```sh
+python3 scripts/lsp_smoke_test.py
+```
+
+The smoke test checks initialization, diagnostics, semantic tokens, and go-to-declaration responses.
+
+## Scope and Limitations
+
+This project does not implement a full LOGO interpreter. It focuses on static source-code analysis for editor features.
+
+Because LOGO does not have one strictly defined standard, this server supports a documented subset of common LOGO constructs and turtle commands. The built-in command list can be extended in `LogoLexer` if support for additional LOGO dialects or commands is needed.
+
+Variable declarations are handled based on procedure parameters. A production-ready implementation could introduce a more complete AST-based analysis model for advanced scoping rules and larger LOGO programs.
 
 ## Connecting to a Client
 
@@ -210,11 +240,25 @@ To use the server, connect it to an LSP-compatible client, for example:
 - VS Code with a generic LSP client extension
 - any editor that supports custom language servers
 
-The client should be configured to start the server with a command similar to:
+For development, the client can start the server with:
 
-```bash
-java -jar /absolute/path/to/logo-lsp-server-all.jar
+```sh
+./gradlew run --quiet
 ```
+
+Alternatively, the project can be installed as a Gradle application distribution:
+
+```sh
+./gradlew installDist
+```
+
+This creates a start script under:
+
+```text
+build/install/LOGO_lsp_server/bin/LOGO_lsp_server
+```
+
+The LSP client can then be configured to run that script.
 
 The language ID should be configured as:
 
@@ -236,26 +280,41 @@ After the client starts the server, opening a `.logo` file should enable the sup
 - diagnostics for simple syntax and reference errors
 
 ## Architecture & Project Layout
+
 The project is organized into small components with clear responsibilities.
 
 ```text
 LOGO_lsp_server/
 ├── README.md
-├── build.gradle
+├── build.gradle.kts
 ├── settings.gradle
+├── examples/
+│   ├── README.md
+│   └── square.logo
+├── scripts/
+│   └── lsp_smoke_test.py
 ├── src/
 │   ├── main/
-│   │   ├── java/
-│   │   │   └── ...
-│   │   └── resources/
+│   │   └── java/
+│   │       └── logo/
+│   │           └── lsp/
+│   │               ├── analysis/
+│   │               ├── features/
+│   │               ├── model/
+│   │               ├── parser/
+│   │               ├── server/
+│   │               └── Main.java
 │   └── test/
+│       ├── README.md
 │       └── java/
+│           └── logo/
+│               └── lsp/
 └── gradle/
 ```
 
 ### Main Components
 
-The server is divided into the following conceptual parts:
+The server is divided into the following conceptual parts.
 
 #### Language Server Entry Point
 
@@ -289,6 +348,7 @@ The parser or analyzer reads the LOGO source code and extracts relevant language
 - variable references
 - turtle commands
 - numeric literals
+- brackets and operators
 
 The extracted information is then used by the LSP features.
 
@@ -298,8 +358,8 @@ The symbol table stores discovered declarations inside a LOGO file.
 
 It maps names to their source code positions, for example:
 
-- procedure name → procedure definition location
-- variable name → parameter declaration location
+- procedure name to procedure definition location
+- variable name to parameter declaration location
 
 This allows the server to implement go-to-declaration.
 
