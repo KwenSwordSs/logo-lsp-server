@@ -17,6 +17,9 @@ import org.eclipse.lsp4j.Range;
  */
 public final class DefinitionFeature {
 
+    private static final String TO_KEYWORD = "to";
+    private static final String END_KEYWORD = "end";
+
     private final LogoAnalyzer analyzer = new LogoAnalyzer();
 
     public List<Location> findDefinition(String uri, String text, Position position) {
@@ -34,8 +37,16 @@ public final class DefinitionFeature {
         LogoToken token = tokenAtCursor.get();
 
         if (token.type() == LogoTokenType.VARIABLE) {
-            String variableName = normalizeVariableName(token.text());
-            LogoSymbol symbol = result.variables().get(variableName);
+            String currentProcedure = findCurrentProcedure(result.tokens(), position);
+
+            if (currentProcedure == null) {
+                return List.of();
+            }
+
+            String variableName = normalizeVariableName(token.text()).toLowerCase();
+            String variableKey = createVariableKey(currentProcedure, variableName);
+
+            LogoSymbol symbol = result.variables().get(variableKey);
             return toLocationList(uri, symbol);
         }
 
@@ -45,6 +56,36 @@ public final class DefinitionFeature {
         }
 
         return List.of();
+    }
+
+    private String findCurrentProcedure(List<LogoToken> tokens, Position position) {
+        String currentProcedure = null;
+
+        for (int i = 0; i < tokens.size(); i++) {
+            LogoToken token = tokens.get(i);
+
+            if (isAfterPosition(token, position)) {
+                break;
+            }
+
+            if (token.type() == LogoTokenType.KEYWORD && TO_KEYWORD.equalsIgnoreCase(token.text())) {
+                if (i + 1 < tokens.size() && tokens.get(i + 1).type() == LogoTokenType.IDENTIFIER) {
+                    currentProcedure = tokens.get(i + 1).text().toLowerCase();
+                }
+            }
+
+            if (token.type() == LogoTokenType.KEYWORD && END_KEYWORD.equalsIgnoreCase(token.text())) {
+                currentProcedure = null;
+            }
+        }
+
+        return currentProcedure;
+    }
+
+    private boolean isAfterPosition(LogoToken token, Position position) {
+        return token.line() > position.getLine()
+            || token.line() == position.getLine()
+            && token.startColumn() > position.getCharacter();
     }
 
     private List<Location> toLocationList(String uri, LogoSymbol symbol) {
@@ -68,5 +109,9 @@ public final class DefinitionFeature {
             return variable.substring(1);
         }
         return variable;
+    }
+
+    private String createVariableKey(String procedureName, String variableName) {
+        return procedureName.toLowerCase() + ":" + variableName.toLowerCase();
     }
 }
