@@ -1,8 +1,10 @@
 package logo.lsp.server;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import java.util.List;
+
 import java.util.concurrent.CompletableFuture;
 
 import logo.lsp.features.DefinitionFeature;
@@ -28,8 +30,8 @@ import org.eclipse.lsp4j.services.TextDocumentService;
  */
 public final class LogoTextDocumentService implements TextDocumentService {
 
-    private final Map<String, String> documents = new HashMap<>();
-
+    private final Map<String, String> documents = new ConcurrentHashMap<>();
+    
     private final SemanticTokensFeature semanticTokensFeature = new SemanticTokensFeature();
     private final DefinitionFeature definitionFeature = new DefinitionFeature();
     private final DiagnosticsFeature diagnosticsFeature = new DiagnosticsFeature();
