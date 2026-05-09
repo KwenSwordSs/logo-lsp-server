@@ -40,7 +40,7 @@ public final class DefinitionFeature {
         }
 
         if (token.type() == LogoTokenType.IDENTIFIER) {
-            LogoSymbol symbol = result.procedures().get(token.text());
+            LogoSymbol symbol = result.procedures().get(token.text().toLowerCase());
             return toLocationList(uri, symbol);
         }
 

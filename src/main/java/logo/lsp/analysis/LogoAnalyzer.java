@@ -60,8 +60,10 @@ public final class LogoAnalyzer {
                 }
 
                 LogoToken procedureName = tokens.get(i + 1);
+                String procedureKey = procedureName.text().toLowerCase();
+
                 procedures.put(
-                    procedureName.text(),
+                    procedureKey,
                     new LogoSymbol(
                         procedureName.text(),
                         LogoSymbolType.PROCEDURE,
@@ -121,7 +123,7 @@ public final class LogoAnalyzer {
                     continue;
                 }
 
-                if (!procedures.containsKey(token.text())) {
+                if (!procedures.containsKey(token.text().toLowerCase())) {
                     diagnostics.add(createDiagnostic(
                         token,
                         "Unknown procedure: " + token.text()
