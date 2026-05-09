@@ -75,4 +75,52 @@ class DefinitionFeatureTest {
 
         assertTrue(locations.isEmpty());
     }
+
+    @Test
+    void findsProcedureDefinitionCaseInsensitive() {
+        DefinitionFeature feature = new DefinitionFeature();
+
+        String text = """
+        to SQUARE :size
+          forward :size
+        end
+
+        square 100
+        """;
+
+        List<Location> locations = feature.findDefinition(
+            "file:///example.logo",
+            text,
+            new Position(4, 1)
+        );
+
+        assertEquals(1, locations.size());
+        assertEquals(0, locations.get(0).getRange().getStart().getLine());
+        assertEquals(3, locations.get(0).getRange().getStart().getCharacter());
+    }
+
+    @Test
+    void findsVariableDefinitionInCorrectProcedureScope() {
+        DefinitionFeature feature = new DefinitionFeature();
+
+        String text = """
+        to square :size
+          forward :size
+        end
+
+        to triangle :size
+          forward :size
+        end
+        """;
+
+        List<Location> locations = feature.findDefinition(
+            "file:///example.logo",
+            text,
+            new Position(1, 12)
+        );
+
+        assertEquals(1, locations.size());
+        assertEquals(0, locations.get(0).getRange().getStart().getLine());
+        assertEquals(10, locations.get(0).getRange().getStart().getCharacter());
+    }
 }

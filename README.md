@@ -204,24 +204,6 @@ The tests cover the following behavior:
 
 The language server can also be tested manually by connecting it to an LSP-compatible editor and opening a `.logo` file.
 
-### LSP Smoke Test
-
-In addition to unit tests, the server can be tested through a small smoke test that starts the generated application script and sends real LSP JSON-RPC messages to it.
-
-First create the Gradle application distribution:
-
-```sh
-./gradlew installDist
-```
-
-Then run:
-
-```sh
-python3 scripts/lsp_smoke_test.py
-```
-
-The smoke test checks initialization, diagnostics, semantic tokens, and go-to-declaration responses.
-
 ## Scope and Limitations
 
 This project does not implement a full LOGO interpreter. It focuses on static source-code analysis for editor features.
@@ -290,9 +272,9 @@ LOGO_lsp_server/
 ├── settings.gradle
 ├── examples/
 │   ├── README.md
-│   └── square.logo
-├── scripts/
-│   └── lsp_smoke_test.py
+│   ├── square.logo
+│   └── errors.logo
+│
 ├── src/
 │   ├── main/
 │   │   └── java/
@@ -359,7 +341,8 @@ The symbol table stores discovered declarations inside a LOGO file.
 It maps names to their source code positions, for example:
 
 - procedure name to procedure definition location
-- variable name to parameter declaration location
+- procedure-local variable key to parameter declaration location
+
 
 This allows the server to implement go-to-declaration.
 

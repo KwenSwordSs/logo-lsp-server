@@ -11,8 +11,8 @@ import org.eclipse.lsp4j.Diagnostic;
  * Stores the reusable analysis result of a LOGO document.
  *
  * @param tokens all lexical tokens found in the document
- * @param procedures procedure declarations by name
- * @param variables variable declarations by name
+ * @param procedures procedure declarations by normalized name
+ * @param variables variable declarations by scoped key, for example procedureName:variableName
  * @param diagnostics diagnostics found during analysis
  */
 public record LogoAnalysisResult(

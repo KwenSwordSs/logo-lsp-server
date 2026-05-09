@@ -44,7 +44,6 @@ public final class LogoAnalyzer {
         List<Diagnostic> diagnostics
     ) {
         boolean insideProcedure = false;
-//        boolean hasOpenProcedure = false;
 
         for (int i = 0; i < tokens.size(); i++) {
             LogoToken token = tokens.get(i);
@@ -74,7 +73,6 @@ public final class LogoAnalyzer {
                 );
 
                 insideProcedure = true;
-//                hasOpenProcedure = true;
 
                 int parameterIndex = i + 2;
                 while (parameterIndex < tokens.size()
@@ -100,7 +98,6 @@ public final class LogoAnalyzer {
 
             if (token.type() == LogoTokenType.KEYWORD && END_KEYWORD.equals(text)) {
                 insideProcedure = false;
-//                hasOpenProcedure = false;
             }
         }
 
