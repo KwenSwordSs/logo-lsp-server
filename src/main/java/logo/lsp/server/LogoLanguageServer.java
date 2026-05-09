@@ -41,7 +41,7 @@ public final class LogoLanguageServer implements LanguageServer, LanguageClientA
 
 
         SemanticTokensLegend legend = new SemanticTokensLegend(
-            List.of("keyword", "function", "variable", "number", "comment", "operator"),
+            List.of("keyword", "function", "variable", "number", "comment", "operator", "bracket"),
             List.of()
         );
 
