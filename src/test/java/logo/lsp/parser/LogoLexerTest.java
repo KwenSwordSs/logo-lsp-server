@@ -82,4 +82,67 @@ class LogoLexerTest {
         assertEquals("left", tokens.get(6).text());
     }
 
+
+    @Test
+    void recognizesSupportedLogoConstructs() {
+        LogoLexer lexer = new LogoLexer();
+
+        String text = """
+        ; this is a comment
+        to square :size
+          repeat 4 [
+            forward :size
+            right 90
+          ]
+        end
+
+        square 100
+        """;
+
+        List<LogoToken> tokens = lexer.tokenize(text);
+
+        assertTrue(tokens.stream().anyMatch(token ->
+            token.type() == LogoTokenType.COMMENT && token.text().equals("; this is a comment")
+        ));
+
+        assertTrue(tokens.stream().anyMatch(token ->
+            token.type() == LogoTokenType.KEYWORD && token.text().equals("to")
+        ));
+
+        assertTrue(tokens.stream().anyMatch(token ->
+            token.type() == LogoTokenType.KEYWORD && token.text().equals("end")
+        ));
+
+        assertTrue(tokens.stream().anyMatch(token ->
+            token.type() == LogoTokenType.KEYWORD && token.text().equals("repeat")
+        ));
+
+        assertTrue(tokens.stream().anyMatch(token ->
+            token.type() == LogoTokenType.COMMAND && token.text().equals("forward")
+        ));
+
+        assertTrue(tokens.stream().anyMatch(token ->
+            token.type() == LogoTokenType.COMMAND && token.text().equals("right")
+        ));
+
+        assertTrue(tokens.stream().anyMatch(token ->
+            token.type() == LogoTokenType.IDENTIFIER && token.text().equals("square")
+        ));
+
+        assertTrue(tokens.stream().anyMatch(token ->
+            token.type() == LogoTokenType.VARIABLE && token.text().equals(":size")
+        ));
+
+        assertTrue(tokens.stream().anyMatch(token ->
+            token.type() == LogoTokenType.NUMBER && token.text().equals("100")
+        ));
+
+        assertTrue(tokens.stream().anyMatch(token ->
+            token.type() == LogoTokenType.BRACKET && token.text().equals("[")
+        ));
+
+        assertTrue(tokens.stream().anyMatch(token ->
+            token.type() == LogoTokenType.BRACKET && token.text().equals("]")
+        ));
+    }
 }
