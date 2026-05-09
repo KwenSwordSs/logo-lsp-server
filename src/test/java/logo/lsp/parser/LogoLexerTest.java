@@ -56,4 +56,30 @@ class LogoLexerTest {
         assertEquals(LogoTokenType.COMMENT, tokens.get(2).type());
         assertEquals("; move forward", tokens.get(2).text());
     }
+
+    @Test
+    void recognizesLogoCommands() {
+        LogoLexer lexer = new LogoLexer();
+
+        List<LogoToken> tokens = lexer.tokenize("forward 100 right 90 back 50 left 45");
+
+        assertEquals(LogoTokenType.COMMAND, tokens.get(0).type());
+        assertEquals("forward", tokens.get(0).text());
+
+        assertEquals(LogoTokenType.NUMBER, tokens.get(1).type());
+        assertEquals("100", tokens.get(1).text());
+
+        assertEquals(LogoTokenType.COMMAND, tokens.get(2).type());
+        assertEquals("right", tokens.get(2).text());
+
+        assertEquals(LogoTokenType.NUMBER, tokens.get(3).type());
+        assertEquals("90", tokens.get(3).text());
+
+        assertEquals(LogoTokenType.COMMAND, tokens.get(4).type());
+        assertEquals("back", tokens.get(4).text());
+
+        assertEquals(LogoTokenType.COMMAND, tokens.get(6).type());
+        assertEquals("left", tokens.get(6).text());
+    }
+
 }

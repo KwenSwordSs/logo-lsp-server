@@ -50,12 +50,12 @@ public final class SemanticTokensFeature {
     private int toSemanticTokenType(LogoTokenType type) {
         return switch (type) {
             case KEYWORD -> 0;
-            case COMMAND -> 1;
-            case IDENTIFIER -> 1;
+            case COMMAND, IDENTIFIER -> 1;
             case VARIABLE -> 2;
             case NUMBER -> 3;
             case COMMENT -> 4;
             case OPERATOR -> 5;
+            case BRACKET -> 6;
             default -> -1;
         };
     }
